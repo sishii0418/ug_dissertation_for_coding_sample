@@ -1,0 +1,33 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Comparison of individual characteristics between TL and JL unemployed workers.\label{tlvsjl}},
+note{}={\footnotesize{Data source: CPS. Observation period is from January 1994 to December 2019. For those who responded as unemployed for multiple times to the survey, the response in the first survey month of unemployment is used for the analysis. Individuals aged 80 or over are excluded. Part-time workforce indicates those who are on layoff from or looking for a part-time job instead of a full-time job. The base variable for the highest level of education indicator is not graduated from high school. Family income level classification can be found in the notes of Table \ref{familyinc_level}.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=r,},
+column{3}={halign=r,},
+column{4}={halign=r,},
+column{5}={halign=r,},
+column{6}={halign=r,},
+column{7}={halign=r,},
+row{1}={halign=c,},
+}                     %% tabularray inner close
+\toprule
+& JL workers &  & TL workers &  &  &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}
+& Mean & Std. Dev. & Mean & Std. Dev. & Diff. in Means & Std. Error \\ \midrule %% TinyTableHeader
+Married                                                 & \num{0.315}  & \num{0.465}  & \num{0.499}  & \num{0.500}  & \num{0.183}***  & \num{0.002} \\
+Male                                                    & \num{0.504}  & \num{0.500}  & \num{0.600}  & \num{0.490}  & \num{0.096}***  & \num{0.002} \\
+Part-time workforce                                     & \num{0.212}  & \num{0.409}  & \num{0.320}  & \num{0.467}  & \num{0.108}***  & \num{0.002} \\
+Age                                                     & \num{33.224} & \num{14.504} & \num{39.821} & \num{14.816} & \num{6.597}***  & \num{0.055} \\
+\Centerstack[l]{Graduated high school \\ but not holding a bachelor degree} & \num{0.041}  & \num{0.198}  & \num{0.045}  & \num{0.208}  & \num{0.005}***  & \num{0.001} \\
+Holding a bachelor degree or above                      & \num{0.150}  & \num{0.357}  & \num{0.145}  & \num{0.352}  & \num{-0.005}*** & \num{0.001} \\
+Family income level                                     & \num{8.423}  & \num{4.269}  & \num{9.419}  & \num{3.802}  & \num{0.997}***  & \num{0.014} \\
+$N$                                                     & \num{466445} &               & \num{85052}  &               &                  &              \\
+\bottomrule
+\end{talltblr}
+\end{table}

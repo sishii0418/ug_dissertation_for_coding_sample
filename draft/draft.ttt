@@ -1,0 +1,118 @@
+\begin{ltable}
+  \input{tlvsjl.tex}
+\end{ltable}
+\efloatseparator
+ 
+\begin{table}
+  \centering
+  \caption{Family income level classification.}
+  \label{familyinc_level}
+  \begin{tabular}{rl}
+  \hline
+  Level & Income               \\ \hline
+  1     & Less than \$5,000    \\
+  2     & \$5,000 to \$7,499   \\
+  3     & \$7,500 to  \$9,999  \\
+  4     & \$10,000 to \$12,499 \\
+  5     & \$12,500 to \$14,999 \\
+  6     & \$15,000 to \$19,999 \\
+  7     & \$20,000 to \$24,999 \\
+  8     & \$25,000 to \$29,999 \\
+  9     & \$30,000 to \$34,999 \\
+  10    & \$35,000 to \$39,999 \\
+  11    & \$40,000 to \$49,999 \\
+  12    & \$50,000 to \$59,999 \\
+  13    & \$60,000 to \$74,999 \\
+  14    & \$75,000 or more     \\ \hline
+  \end{tabular}
+  \subcaption*{In the raw CPS data, family income refers to combined income of all family members during the last 12 months, including both labour and non-labour incomes. Starting in October 2003, additional levels are introduced to classify the ranges \$75,000 to 99,999 and \$100,000 to 149,999. However, for this paper's analysis, those new levels are included in Level 14 for consistency with older data.}
+\end{table}
+\efloatseparator
+ 
+\begin{ltable}
+  \input{log_reg_res.tex}
+\end{ltable}
+\efloatseparator
+ 
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Matching function estimation: baseline vs split in unemployment depending on searching or not\label{matching_fn}},
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+note{ }={\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. The odd numbered columns show estimates for the baseline model, while the even numbered for the extended model treating non-searching TL workers differently. Month dummies are included in the estimation. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are up to 5 lags of the corresponding endogenous variable.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+cell{1}{6}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+hline{9}={1,2,3,4,5,6,7}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS &  & OLS in FD &  & IV in FD &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}\cmidrule[lr]{6-7}
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+(Intercept)               & -0.157*** & 0.725*** &          &          &             &             \\
+& (0.029)   & (0.082)  &          &          &             &             \\
+$\eta$                   & 0.693***  & 0.551*** & 0.314*** & 0.313*** & 0.504***    & 0.527***    \\
+& (0.012)   & (0.020)  & (0.044)  & (0.044)  & (0.136)     & (0.133)     \\
+$\alpha$                 &           & 0.439*** &          & 0.010    &             & -0.004      \\
+&           & (0.041)  &          & (0.025)  &             & (0.026)     \\
+Sargan test               &           &          &          &          & 11.9$^{**}$ & 11.9$^{**}$ \\
+($p$-value)               &           &          &          &          & (0.0078)    & (0.0025)    \\
+First stage $F$ statistic &           &          &          &          & 9.68        & 10.2        \\
+Num.Obs.                  & 229       & 229      & 228      & 228      & 224         & 224         \\
+R2                        & 0.918     & 0.944    & 0.900    & 0.894    & 0.890       & 0.880       \\
+RMSE                      & 0.12      & 0.10     & 0.05     & 0.05     & 0.05        & 0.05        \\
+\bottomrule
+\end{talltblr}
+\end{table}
+\efloatseparator
+ 
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Matching function estimation: alternative splits in unemployment\label{matching_fn_compare}},
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+note{ }={\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. The odd numbered columns show estimates for the JL/TL split model, while the even numbered for the three-way split model. Month dummies are included in the estimation. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are up to 5 lags of the corresponding endogeneous variable.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+cell{1}{6}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+hline{11}={1,2,3,4,5,6,7}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS &  & OLS in FD &  & IV in FD &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}\cmidrule[lr]{6-7}
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+(Intercept)               & 0.660*** & 1.120*** &          &          &             &             \\
+& (0.054)  & (0.070)  &          &          &             &             \\
+\eta                     & 0.597*** & 0.661*** & 0.316*** & 0.320*** & 0.523***    & 0.533***    \\
+& (0.015)  & (0.026)  & (0.044)  & (0.044)  & (0.134)     & (0.132)     \\
+\alpha                   & 0.512*** & 0.352*** & 0.049    & 0.059**  & 0.029       & 0.055*      \\
+& (0.035)  & (0.043)  & (0.031)  & (0.021)  & (0.033)     & (0.023)     \\
+\beta                    &          & 0.160**  &          & 0.005    &             & -0.010      \\
+&          & (0.058)  &          & (0.025)  &             & (0.027)     \\
+Sargan test               &          &          &          &          & 12.3$^{**}$ & 11.5$^{**}$ \\
+($p$-value)               &          &          &          &          & (0.0065)    & (0.0093)    \\
+First stage $F$-statistic &          &          &          &          & 10.1        & 10.1        \\
+Num.Obs.                  & 229      & 229      & 228      & 228      & 224         & 224         \\
+R2                        & 0.950    & 0.956    & 0.890    & 0.892    & 0.877       & 0.878       \\
+RMSE                      & 0.09     & 0.09     & 0.05     & 0.05     & 0.05        & 0.05        \\
+\bottomrule
+\end{talltblr}
+\end{table}

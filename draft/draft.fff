@@ -1,0 +1,85 @@
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}[grow=right]
+    \tikzset{level 1/.style={level distance = 4cm}}
+    \tikzset{level 2/.style={level distance = 3.5cm}}
+    \tikzset{level 3+/.style={level distance = 3cm}}
+    \node{Surveyed population}
+      child{node{Not in labour force}}
+      child{node{Unemployed}
+        child{node{JL}}
+        child{node{TL}
+          child{node{Not looking for another job}}
+          child{node{Looking for another job}}
+        }
+      }
+      child{node{Employed}}
+    ;
+  \end{tikzpicture}
+  \caption{Tree structure of labour market status in CPS.}
+  \subcaption*{TL = Temporary layoff, JL = Job-less unemployment (unemployment for any other reasons than temporary layoff). Definitions for the classifications are provided in the body text.}
+  \label{cps_tree}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{TL_share_out_of_U.pdf}
+  \caption{Share of temporary layoff in all types of unemployment}
+  \subcaption*{Data source: CPS. Observation period is from January 1967 to December 2019. The solid line shows a quarter moving average of the monthly counts. All unemployment recorded on CPS is exclusively classified into one of the following types: job losers on layoff; job losers not on layoff; job leavers; reentrants to the labour force; and new entrants to the labour force. Shaded areas indicate recessions dated by NBER.}
+  \label{TL_share_out_of_U}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{familyinc.pdf}
+  \caption{Density of TL/JL unemployed workers by family income level}
+  \subcaption*{Data source: CPS. Observation period is from January 1994 to December 2019. Family income level classification refers to Table \ref{familyinc_level}.}
+  \label{familyinc}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{search_TL_share.pdf}
+  \caption{Share of TL workers who are looking for an alternative job in all TL workers}
+  \subcaption*{Data source: CPS. Observation period is from January 1994 to December 2019. The black solid line indicates the 12-month moving average of the monthly proportion values. Shaded areas denote recessions dated by NBER.}
+  \label{search_TL_share}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{finding_rates_by_search.pdf}
+  \caption{job-finding rates for the unemployed by whether searching for a new job or not}
+  \subcaption*{Data source: CPS. Observation period is from October 1995 to December 2019. Yearly moving average of the monthly data is shown. Job-finding rate for the unemployed looking for a new job is the probability of those workers becoming employed in the following month. Similar for that for TL workers not looking for another job, and the rate for all unemployed is the weighted average of the two. Shaded areas indicate recessions dated by NBER.}
+  \label{finding_rates_by_search}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{finding_rates_JLTL.pdf}
+  \caption{Comparison of job-finding rates for different types of unemployed workers}
+  \subcaption*{Data source: CPS. Observation period is from October 1995 to December 2019. Yearly moving average of the monthly data is shown. Job-finding rate for the JL unemployed workers is the probability of those becoming employed in the following month. Similar for the other three job-finding rates. Shaded areas indicate recessions dated by NBER.}
+  \label{finding_rates_JLTL}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{finding_rates_benchmark.pdf}
+  \caption{Comparison of estimated finding rates based on JOLTS hiring level vs. labour market transitions in CPS}
+  \subcaption*{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. Job-finding rates are estimated based on (1) JOLTS hiring level divided by CPS unemployment level (2) probability of an unemployed worker being employed in the following month as recorded in raw CPS data. Shaded areas indicate recessions dated by NBER.}
+  \label{finding_rates_benchmark}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+  \centering
+  \includegraphics[width=150mm]{efficiency.pdf}
+  \caption{Estimated matching efficiencies compared across different models}
+  \subcaption*{Yearly moving average of the monthly market efficiency, measured as the estimated residuals of OLS estimation is presented for each of the four models. Estimation period is from December 2000 to December 2019. Shaded areas indicate recessions dated by NBER.}
+  \label{efficiency}
+\end{figure}

@@ -1,0 +1,74 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  This bbl file is created by aea.bst ver.3.2
+%  The latest aea.bst is available at
+%  <https://github.com/ShiroTakeda/econ-bst>
+
+\begin{thebibliography}{xxx}
+
+\harvarditem[Barnichon]{Barnichon}{2010}{barnichon2010building}
+\textbf{Barnichon, Regis.} 2010. ``Building a Composite {{Help-Wanted Index}}.'' \textit{Economics Letters} 109 (3):   175--178. \href{http://dx.doi.org/10.1016/j.econlet.2010.08.029}{\urlstyle{rm} \nolinkurl{10.1016/j.econlet.2010.08.029}}.
+
+\harvarditem[Barnichon and Figura]{Barnichon and Figura}{2015}{barnichon2015labor}
+\textbf{Barnichon, Regis, and Andrew Figura.} 2015. ``Labor {{Market Heterogeneity}} and the {{Aggregate Matching Function}}.'' \textit{American Economic Journal: Macroeconomics} 7 (4):   222--49. \href{http://dx.doi.org/10.1257/mac.20140116}{\urlstyle{rm} \nolinkurl{10.1257/mac.20140116}}.
+
+\harvarditem[{Borowczyk-Martins} et~al.]{{Borowczyk-Martins}, Jolivet, and {Postel-Vinay}}{2013}{borowczyk-martins2013accounting}
+\textbf{{Borowczyk-Martins}, Daniel, Gr{\'e}gory Jolivet, and Fabien {Postel-Vinay}.} 2013. ``Accounting for Endogeneity in Matching Function Estimation.'' \textit{Review of Economic Dynamics} 16 (3):   440--451. \href{http://dx.doi.org/10.1016/j.red.2012.07.001}{\urlstyle{rm} \nolinkurl{10.1016/j.red.2012.07.001}}.
+
+\harvarditem[Elsby et~al.]{Elsby, Hobijn, and {\c S}ahin}{2015}{elsby2015importance}
+\textbf{Elsby, Michael~W.L., Bart Hobijn, and Ay{\c s}eg{\"u}l {\c S}ahin.} 2015. ``On the Importance of the Participation Margin for Labor Market Fluctuations.'' \textit{Journal of Monetary Economics} 72  64--82. \href{http://dx.doi.org/10.1016/j.jmoneco.2015.01.004}{\urlstyle{rm} \nolinkurl{10.1016/j.jmoneco.2015.01.004}}.
+
+\harvarditem[Forsythe et~al.]{Forsythe, Kahn, Lange, and Wiczer}{2022}{forsythe2022where}
+\textbf{Forsythe, Eliza, Lisa~B. Kahn, Fabian Lange, and David Wiczer.} 2022. ``Where Have All the Workers Gone? {{Recalls}}, Retirements, and Reallocation in the {{COVID}} Recovery.'' \textit{Labour Economics} 78 102251. \href{http://dx.doi.org/10.1016/j.labeco.2022.102251}{\urlstyle{rm} \nolinkurl{10.1016/j.labeco.2022.102251}}.
+
+\harvarditem[Fujita and Moscarini]{Fujita and Moscarini}{2017}{fujita2017recall}
+\textbf{Fujita, Shigeru, and Giuseppe Moscarini.} 2017. ``Recall and {{Unemployment}}.'' \textit{American Economic Review} 107 (12):   3875--3916. \href{http://dx.doi.org/10.1257/aer.20131496}{\urlstyle{rm} \nolinkurl{10.1257/aer.20131496}}.
+
+\harvarditem[Gallant et~al.]{Gallant, Kroft, Lange, and Notowidigdo}{2020}{gallant2020temporary}
+\textbf{Gallant, Jessica, Kory Kroft, Fabian Lange, and Matthew~J. Notowidigdo.} 2020. ``Temporary {{Unemployment}} and {{Labor Market Dynamics}} during the {{COVID-19 Recession}}.'' \textit{Brookings Papers on Economic Activity}  167--216.
+
+\harvarditem[Gertler et~al.]{Gertler, Huckfeldt, and Trigari}{2022}{gertler2022temporary}
+\textbf{Gertler, Mark, Christopher~K Huckfeldt, and Antonella Trigari.} 2022. ``Temporary {{Layoffs}}, {{Loss-of-Recall}} and {{Cyclical Unemployment Dynamics}}.'' \textit{National Bureau of Economic Research Working Paper Series} No. 30134. \href{http://dx.doi.org/10.3386/w30134}{\urlstyle{rm} \nolinkurl{10.3386/w30134}}.
+
+\harvarditem[Hall and Kudlyak]{Hall and Kudlyak}{2022}{hall2022unemployed}
+\textbf{Hall, Robert~E., and Marianna Kudlyak.} 2022. ``The Unemployed with Jobs and without Jobs.'' \textit{Labour Economics} 79 102244. \href{http://dx.doi.org/10.1016/j.labeco.2022.102244}{\urlstyle{rm} \nolinkurl{10.1016/j.labeco.2022.102244}}.
+
+\harvarditem[Hall and {Schulhofer-Wohl}]{Hall and {Schulhofer-Wohl}}{2018}{hall2018measuring}
+\textbf{Hall, Robert~E., and Sam {Schulhofer-Wohl}.} 2018. ``Measuring {{Job-Finding Rates}} and {{Matching Efficiency}} with {{Heterogeneous Job-Seekers}}.'' \textit{American Economic Journal: Macroeconomics} 10 (1):   1--32. \href{http://dx.doi.org/10.1257/mac.20170061}{\urlstyle{rm} \nolinkurl{10.1257/mac.20170061}}.
+
+\harvarditem[Katz and Meyer]{Katz and Meyer}{1990}{katz1990impact}
+\textbf{Katz, Lawrence~F., and Bruce~D. Meyer.} 1990. ``The Impact of the Potential Duration of Unemployment Benefits on the Duration of Unemployment.'' \textit{Journal of Public Economics} 41 (1):   45--72. \href{http://dx.doi.org/10.1016/0047-2727(92)90056-L}{\urlstyle{rm} \nolinkurl{10.1016/0047-2727(92)90056-L}}.
+
+\harvarditem[Komatsu]{Komatsu}{2024}{komatsu2024temporary}
+\textbf{Komatsu, Katsuhiro.} 2024. ``Temporary {{Layoffs}} and {{Unemployment Insurance}}.'' November.
+
+\harvarditem[Lange and Papageorgiou]{Lange and Papageorgiou}{2020}{lange2020cobbdouglas}
+\textbf{Lange, Fabian, and Theodore Papageorgiou.} 2020. ``Beyond {{Cobb-Douglas}}: {{Flexibly Estimating Matching Functions}} with {{Unobserved Matching Efficiency}}.'' Working {{Paper}} 26972, National Bureau of Economic Research. \href{http://dx.doi.org/10.3386/w26972}{\urlstyle{rm} \nolinkurl{10.3386/w26972}}.
+
+\harvarditem[Mortensen and Pissarides]{Mortensen and Pissarides}{1994}{mortensen1994job}
+\textbf{Mortensen, Dale~T., and Christopher~A. Pissarides.} 1994. ``Job Creation and Job Destruction in the Theory of Unemployment.'' \textit{The Review of Economic Studies} 61 (3):   397--415. \href{http://dx.doi.org/10.2307/2297896}{\urlstyle{rm} \nolinkurl{10.2307/2297896}}.
+
+\harvarditem[Nekarda]{Nekarda}{2009}{nekarda2009longitudinal}
+\textbf{Nekarda, Christopher~J.} 2009. ``A Longitudinal Analysis of the Current Population Survey: {{Assessing}} the Cyclical Bias of Geographic Mobility.'' May.
+
+\harvarditem[Nekoei and Weber]{Nekoei and Weber}{2015}{nekoei2015recall}
+\textbf{Nekoei, Arash, and Andrea Weber.} 2015. ``Recall Expectations and Duration Dependence.'' \textit{American Economic Review} 105 (5):   142--46. \href{http://dx.doi.org/10.1257/aer.p20151064}{\urlstyle{rm} \nolinkurl{10.1257/aer.p20151064}}.
+
+\harvarditem[Nekoei and Weber]{Nekoei and Weber}{2020}{nekoei2020seven}
+\textbf{Nekoei, Arash, and Andrea~Michaela Weber.} 2020. ``Seven {{Facts}} about {{Temporary Layoffs}}.'' \textit{SSRN Electronic Journal}. \href{http://dx.doi.org/10.2139/ssrn.3617226}{\urlstyle{rm} \nolinkurl{10.2139/ssrn.3617226}}.
+
+\harvarditem[Pacas and Flood]{Pacas and Flood}{2015}{pacas2015using}
+\textbf{Pacas, Jose, and Sarah Flood.} 2015. ``Using the {{Annual Social}} and {{Economic Supplement}} with {{Current Population Survey Panels}}.'' In  \textit{Population {{Association}} of {{America}} 2015 {{Annual Meeting}}}, San Diego, CA: Minnesota Population Center, University of Minnesota.
+
+\harvarditem[Petrongolo and Pissarides]{Petrongolo and Pissarides}{2001}{petrongolo2001looking}
+\textbf{Petrongolo, Barbara, and Christopher~A. Pissarides.} 2001. ``Looking into the {{Black Box}}: {{A Survey}} of the {{Matching Function}}.'' \textit{Journal of Economic Literature} 39 (2):   390--431. \href{http://dx.doi.org/10.1257/jel.39.2.390}{\urlstyle{rm} \nolinkurl{10.1257/jel.39.2.390}}.
+
+\harvarditem[Pissarides]{Pissarides}{2000}{pissarides2000equilibrium}
+\textbf{Pissarides, Christopher~A.} 2000.  \textit{Equilibrium {{Unemployment Theory}}}. Second edition, The MIT Press.
+
+\harvarditem[Staiger and Stock]{Staiger and Stock}{1997}{staiger1997instrumental}
+\textbf{Staiger, Douglas, and James~H. Stock.} 1997. ``Instrumental Variables Regression with Weak Instruments.'' \textit{Econometrica} 65 (3):   557--586.
+
+\harvarditem[Yashiv]{Yashiv}{2000}{yashiv2000determinants}
+\textbf{Yashiv, Eran.} 2000. ``The Determinants of Equilibrium Unemployment.'' \textit{American Economic Review} 90 (5):   1297--1322. \href{http://dx.doi.org/10.1257/aer.90.5.1297}{\urlstyle{rm} \nolinkurl{10.1257/aer.90.5.1297}}.
+
+\end{thebibliography}

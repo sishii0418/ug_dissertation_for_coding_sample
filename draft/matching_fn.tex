@@ -1,0 +1,39 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Matching function estimation: baseline vs split in unemployment depending on searching or not\label{matching_fn}},
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+note{ }={\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. The odd numbered columns show estimates for the baseline model, while the even numbered for the extended model treating non-searching TL workers differently. Month dummies are included in the estimation. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are up to 5 lags of the corresponding endogenous variable.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+cell{1}{6}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+hline{9}={1,2,3,4,5,6,7}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS &  & OLS in FD &  & IV in FD &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}\cmidrule[lr]{6-7}
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+(Intercept)               & -0.157*** & 0.725*** &          &          &             &             \\
+& (0.029)   & (0.082)  &          &          &             &             \\
+$\eta$                   & 0.693***  & 0.551*** & 0.314*** & 0.313*** & 0.504***    & 0.527***    \\
+& (0.012)   & (0.020)  & (0.044)  & (0.044)  & (0.136)     & (0.133)     \\
+$\alpha$                 &           & 0.439*** &          & 0.010    &             & -0.004      \\
+&           & (0.041)  &          & (0.025)  &             & (0.026)     \\
+Sargan test               &           &          &          &          & 11.9$^{**}$ & 11.9$^{**}$ \\
+($p$-value)               &           &          &          &          & (0.0078)    & (0.0025)    \\
+First stage $F$ statistic &           &          &          &          & 9.68        & 10.2        \\
+Num.Obs.                  & 229       & 229      & 228      & 228      & 224         & 224         \\
+R2                        & 0.918     & 0.944    & 0.900    & 0.894    & 0.890       & 0.880       \\
+RMSE                      & 0.12      & 0.10     & 0.05     & 0.05     & 0.05        & 0.05        \\
+\bottomrule
+\end{talltblr}
+\end{table}

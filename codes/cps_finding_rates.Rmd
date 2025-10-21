@@ -1,0 +1,193 @@
+
+```{r}
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(marginaleffects)
+library(tis)
+library(tidyquant)
+library(estimatr)
+library(urca)
+```
+
+# Recession period data
+```{r}
+# Call nberDates() to obtain recession date matrix
+recessions <- nberDates() %>%
+  data.frame() %>%
+  # lubridate
+  mutate(Start = lubridate::ymd(Start)) %>%
+  mutate(End = lubridate::ymd(End)) %>%
+  # only need after 1967
+  filter(ym(199401) <= Start &
+         End <= ym(201912))
+```
+
+Loop initialisation
+```{r, eval = FALSE}
+# Table to save calculation results
+f_table <- data.frame(ym = as.character(),
+                      f_U = as.numeric(),
+                      f_JL = as.numeric(),
+                      f_TL = as.numeric(),
+                      f_TLsearch = as.numeric(),
+                      f_TLnonsearch = as.numeric(),
+                      f_searchers = as.numeric())
+
+yms <- seq(ym(199401), ym(202412), by = "month") %>%
+  format("%Y%m")
+```
+
+For-loop
+```{r, eval = FALSE}
+for (i in 1:(length(yms) - 1)) {
+  base_month <- haven::read_dta(paste0("data/cpsbmk/cpsbmk", yms[i], ".dta"))
+  base_month <- base_month %>%
+    # remove those for which this is the 4th / last survey month because they are not surveyed in the following month
+    filter(hrmis != 4 & hrmis != 8) %>%
+    # add status code
+    mutate(status = case_when(pemlr == 1 | pemlr == 2 ~ 1, # E
+                              pemlr == 4 ~ 2, # JL
+                              pemlr == 3 & pelaylk == 1 ~ 3, # TL searching
+                              pemlr == 3 & pelaylk == 2 ~ 4, # TL not searching
+                              TRUE ~ 5)) %>% # NIL
+    mutate(month = "base")
+
+  following_month <- haven::read_dta(paste0("data/cpsbmk/cpsbmk", yms[i+1], ".dta"))
+  following_month <- following_month %>%
+    # remove those for which this is the 1st / 5th survey month because they were not surveyed in the previous month
+    filter(hrmis != 1 & hrmis != 5) %>%
+    # add status code
+    mutate(status = case_when(pemlr == 1 | pemlr == 2 ~ 1, # E
+                              pemlr == 4 ~ 2, # JL
+                              pemlr == 3 & pelaylk == 1 ~ 3, # TL searching
+                              pemlr == 3 & pelaylk == 2 ~ 4, # TL not searching
+                              TRUE ~ 5)) %>% # NIL
+    mutate(month = "following")
+
+  # Combine the datasets for the two adjacent months
+  combined <- bind_rows(base_month, following_month) %>%
+    pivot_wider(id_cols = pid,
+                names_from = month,
+                values_from = status) %>%
+    filter(!is.na(base))
+
+  rate_table <- combined %>%
+    group_by(base, following) %>%
+    count() %>%
+    group_by(base) %>%
+    mutate(sum(n), rate = n / sum(n))
+
+  f_JL <- rate_table$rate[7] # Finding rate for JL
+  f_TLsearch <- rate_table$rate[13] # Finding rate for TL searching
+  f_TLnonsearch <- rate_table$rate[19] # Finding rate for TL searching
+  f_TL <- (rate_table$n[13] + rate_table$n[19]) / (rate_table$`sum(n)`[13] + rate_table$`sum(n)`[19]) # Finding rate for TL both searching and not searching combined
+  f_U <- (rate_table$n[7] + rate_table$n[13] + rate_table$n[19]) / (rate_table$`sum(n)`[7] + rate_table$`sum(n)`[13] + rate_table$`sum(n)`[19]) # Finding rate for the whole U
+  f_searchers <- (rate_table$n[7] + rate_table$n[13]) / (rate_table$`sum(n)`[7] + rate_table$`sum(n)`[13]) # Finding rate for TL both searching and not searching combined
+
+  f_table <- f_table %>%
+    bind_rows(data.frame(ym = yms[i + 1], f_U, f_JL, f_TL, f_TLsearch, f_TLnonsearch, f_searchers))
+
+  print(f_table %>% tail(n = 1))
+}
+```
+
+```{r, eval = FALSE}
+f_table <- f_table %>%
+  mutate(ym = ym(ym))
+write_rds(f_table, "data/f_table.Rds")
+```
+
+```{r}
+f_table <- read_rds("data/f_table.Rds")
+```
+
+```{r}
+cps <- read_csv("codes_figures/on_layoff_search.csv")
+jolts <- readRDS("codes_figures/jolts.Rds")
+jolts <- jolts %>%
+  filter(ym(200012) <= ym & ym <= ym(201912))
+
+cps_jolts_combined <- left_join(cps, jolts, by = "ym") %>%
+  filter(ym <= ym(201912))
+
+cps_jolts_combined <- cps_jolts_combined %>%
+  mutate(U = LNU03000000) %>%
+  mutate(V = as.numeric(JTU000000000000000JOL)) %>%
+  mutate(M = as.numeric(JTU000000000000000HIL)) %>%
+  mutate(f = log(M / U)) %>%
+  mutate(trends = row_number(ym)) %>%
+  mutate(monthdummy = factor(month(ym))) %>%
+  select(U, V, M, f, trends, monthdummy, ym) %>%
+  mutate(theta = log(V / U)) %>%
+  mutate(theta_delta = dplyr::lag(theta) - theta) %>%
+  mutate(theta_lag_2 = dplyr::lag(theta, 2),
+         theta_lag_3 = dplyr::lag(theta, 3),
+         theta_lag_4 = dplyr::lag(theta, 4),
+         theta_lag_5 = dplyr::lag(theta, 5))
+
+cps_jolts_combined <- cps_jolts_combined %>%
+  left_join(f_table, by = "ym")
+
+cps_jolts_combined <- cps_jolts_combined %>%
+  mutate(log_f_U_delta = dplyr::lag(log(f_U)) - log(f_U),
+         log_f_searchers_delta = dplyr::lag(log(f_searchers)) - log(f_searchers),
+         log_f_JL_delta = dplyr::lag(log(f_JL)) - log(f_JL),
+         log_f_TLsearch_delta = dplyr::lag(log(f_TLsearch)) - log(f_TLsearch),
+         log_f_TLnonsearch_delta = dplyr::lag(log(f_TLnonsearch)) - log(f_TLnonsearch),
+         log_f_TL_delta = dplyr::lag(log(f_TL)) - log(f_TL),
+         f_delta = dplyr::lag(f) - f)
+```
+
+```{r}
+cps_jolts_combined %>%
+  filter(ym <= ym(201912)) %>%
+  ggplot() +
+  geom_line(aes(x = ym, y = theta)) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = -2, ymax = 0.5),
+            alpha = 0.2) +
+  labs(x = "Date", y = "The log of market tightness (log(V/U))")
+ggsave("log_market_tightness.pdf")
+```
+# Compare finding rates
+```{r}
+f_table %>%
+  filter(ym(199510) <= ym & ym <= ym(201912)) %>%
+  ggplot() +
+  geom_ma(n = 12, aes(x = ym, y = f_U, color = "All unemployment types"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = f_searchers, color = "The unemployed looking for a new job"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = f_TLnonsearch, color = "TL workers not looking for another job"), linetype = 1) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = 0.0, ymax = 0.55),
+            alpha = 0.2) +
+  labs(x = "Date", y = "Job finding rates", color = "Job finding rates for:")
+ggsave("draft/finding_rates_by_search.pdf")
+```
+# Compare finding rates 2
+```{r}
+f_table %>%
+  filter(ym(199510) <= ym & ym <= ym(201912)) %>%
+  ggplot() +
+  geom_ma(n = 12, aes(x = ym, y = f_JL, color = "All JL workers"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = f_TLsearch, color = "TL workers looking for a new job"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = f_TL, color = "All TL workers"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = f_TLnonsearch, color = "TL workers not looking for another job"), linetype = 1) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = 0.0, ymax = 0.55),
+            alpha = 0.2) +
+  labs(x = "Date", y = "Job finding rates", color = "Job finding rates for:")
+ggsave("draft/finding_rates_JLTL.pdf")
+```
+# Compare finding rates JOLTS vs CPS
+```{r}
+cps_jolts_combined %>%
+  ggplot() +
+  geom_line(aes(x = ym, y = log(M/U), color = "Based on hiring level (JOLTS) \ndevided by unemployment level (CPS)")) +
+  geom_line(aes(x = ym, y = log(f_U), color = "Based on transition rates (CPS)")) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = -2.25, ymax = 0.25),
+            alpha = 0.2) +
+  labs(x = "Date", y = "Log of job finding rates", color = "Finding rates")
+ggsave("finding_rates_benchmark.pdf")
+```

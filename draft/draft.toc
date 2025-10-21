@@ -1,0 +1,23 @@
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1}%
+\contentsline {section}{\numberline {2}Literature}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Temporary Layoff Unemployment}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Estimating a Matching Function}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Use of a Matching Function in a Search and Matching Model}{5}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Data}{6}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Alternative Datasets}{7}{subsection.3.1}%
+\contentsline {section}{\numberline {4}Descriptive Statistics}{8}{section.4}%
+\contentsline {subsection}{\numberline {4.1}TL vs JL Unemployment}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}TL Unemployed Workers on Search vs Not on Search for Another Job}{9}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Job-finding Rates by Types of Unemployment}{10}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Methodology}{12}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Estimating a Basic Matching Function}{12}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Heterogeneous Unemployed Workers}{13}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Endogeneity Issue in Estimating a Matching Function}{14}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Results}{14}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Matching Function Estimates for the Baseline and Extended ``Search/no-search Split'' Models}{14}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Matching Function at Different Aggregation Levels of Unemployment Types}{16}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Estimated Matching Efficiencies}{17}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Discussion and Conclusions}{19}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Heterogeneity in Unemployed Workers on Temporary Layoff}{19}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Accounting for Heterogeneity of the Unemployed in a Matching Function Estimation}{19}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Suggestions for Future Research}{20}{subsection.7.3}%

@@ -1,0 +1,252 @@
+# Search or not to search? Logistic regression
+
+```{r}
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(marginaleffects)
+library(tis)
+library(tidyquant)
+```
+```{r}
+# Pre-select variables to use
+selected_vars <- c(
+  "pruntype", # reason for unemployment
+  "pelaylk", # even though you are to be called back to work, have you been looking for work during the last 4 weeks.
+  "pulaydt", # has your employer given you a date to return to work?
+  "pulay6m", # have you been given any indication that you will be recalled to work within the next 6 months?
+  "pelaydur", # duriation of layoff
+  "hrhhid", # household identifier
+  "hrsample", # sample identifier
+  "hrhhid2", # household identifier
+  "huhhnum", # household number
+  "hufaminc", # family income (factorise!)
+  "hefaminc", # family income (factorise!) (since Jan 2010)
+  "hrmis", # month in sample
+  "hrmonth", # month of interview
+  "hryear", # year of interview, 2 digits, -1997
+  "hryear4", # year of interview, 4 digits, 1998-
+  "hrsample", # sample identifier
+  "peage", # persons age as of the end of survey week
+  "prtage", # persons age (since May 2012)
+  "pesex", # sex
+  "peeduca", # highest level of school completed or degree received
+  "prftlf", # full time labor force
+  "hrnumhou", # total number of persons living in the household (household members).
+  "pulineno", # person's line number
+  "pemaritl" # marital status
+)
+cps1994_2024_unemployed <- haven::read_dta("data/cps1994-2024_unemployed.dta", encoding = "UTF-8", col_select = all_of(selected_vars))
+cps1994_2024_unemployed <- cps1994_2024_unemployed %>%
+  mutate(year = if_else(is.na(hryear4), as.numeric(paste0("19", hryear)), as.numeric(hryear4))) %>%
+  select(-hryear, -hryear4) %>%
+  filter(year < 2020) %>%
+  mutate(male = pesex == 1,
+         part_time = prftlf == 2,
+         married = pemaritl == 1 | pemaritl == 2,
+         highschool = 39 <= peeduca & 43 < peeduca,
+         bachelor = 43 <= peeduca,
+         faminc = if_else(is.na(hefaminc), hufaminc, hefaminc),
+         age = if_else(is.na(prtage), peage, prtage)) %>%
+  mutate(faminc = case_when((year > 2003 | year == 2003 & hrmonth > 10) & faminc > 14 ~ 14,
+                            TRUE ~ faminc)) %>%
+  filter(age < 80) %>%
+  filter(faminc <= 14)
+
+# To match individuals across months
+# Identifiers change on May 2004
+# Before that, use hrhhid & hrsample & huhhnum & pulineno
+# After that, use hrhhid & hrhhid2 & pulineno
+# The problem is for those who were surveyed beyond May 2004; those started being surveyed between Feb 2003 and Apr 2004.
+# Here those people are identified and matched by only hrhhid & pulineno
+cps1994_2024_unemployed <- cps1994_2024_unemployed %>%
+  mutate(hrmis = as.numeric(hrmis)) %>%
+  mutate(months_since_Feb1993 = (year - 1993) * 12 + hrmonth - 2,
+         months_since_first_interview = if_else(hrmis <= 4, hrmis - 1, hrmis + 7)) %>%
+  mutate(first_interview = ym(paste0(year, hrmonth)) - months(months_since_first_interview)) %>%
+  mutate(aroundApr2004 = case_when(first_interview < ym(200302) ~ "pre",
+                                   ym(200302) <= first_interview & first_interview <= ym(200404) ~ "around",
+                                   TRUE ~ "post")) %>%
+  mutate(individual_id = case_when(aroundApr2004 == "pre" ~ paste(hrhhid, hrsample, huhhnum, pulineno, sep = "-"),
+                                   aroundApr2004 == "around" ~ paste(hrhhid, pulineno, sep = "-"),
+                                   aroundApr2004 == "post" ~ paste(hrhhid, hrhhid2, pulineno, sep = "-")
+                                   ))
+# Filter only those on temporary layoff, either with a specific date to return or given an indication to be recalled
+cps1994_2024_unemployed_tl_only <- cps1994_2024_unemployed %>%
+  filter(pruntype == 1) %>%
+  filter(pulaydt == 1 | pulay6m == 1)
+# variables
+cps1994_2024_unemployed_tl_only <- cps1994_2024_unemployed_tl_only %>%
+  mutate(searching = pelaylk == 1,
+         return_date = pulaydt == 1,
+         indication = pulay6m == 1 & pulaydt != 1,
+         male = pesex == 1,
+         part_time = prftlf == 2)
+```
+Count those who are searching and not
+```{r}
+cps1994_2024_unemployed_tl_only %>%
+  group_by(searching) %>%
+  count()
+```
+# Searching TL proportion plot
+## Recession period data
+```{r}
+# Call nberDates() to obtain recession date matrix
+recessions <- nberDates() %>%
+  data.frame() %>%
+  # lubridate
+  mutate(Start = lubridate::ymd(Start)) %>%
+  mutate(End = lubridate::ymd(End)) %>%
+  filter(Start >= ym(199401))
+```
+```{r}
+cps1994_2024_unemployed_tl_only %>%
+  mutate(date = ym(paste0(year, hrmonth))) %>%
+  group_by(searching, date) %>%
+  count() %>%
+  pivot_wider(values_from = n, names_from = searching) %>%
+  mutate(search_prob = `TRUE` / (`FALSE` + `TRUE`)) %>%
+  ggplot() +
+  geom_ma(aes(x = date, y = search_prob), n = 12, color = "black", linetype = 1) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = 0.25, ymax = 0.45),
+            alpha = 0.3) +
+  labs(x = "Date", y = "Share of TL workers looking for an alternative job out of the whole TL workers")
+ggsave("search_TL_share.pdf")
+```
+
+```{r}
+cps1994_2024_unemployed_tl_only %>%
+  group_by(pulaydt, pulay6m) %>%
+  count()
+logistic_basic <- feglm(searching ~ return_date, data = cps1994_2024_unemployed_tl_only, vcov = "HC1", family = "binomial")
+summary(logistic_basic)
+predict(logistic_basic, newdata = data.frame(return_date = TRUE), type = "response") # P(search | indication_only) = 27.92857%
+predict(logistic_basic, newdata = data.frame(return_date = FALSE), type = "response") # P(search | specific return date) = 45.777%
+```
+Time-fixed effects
+```{r}
+logistic_tfe <- feglm(searching ~ return_date | factor(year), data = cps1994_2024_unemployed_tl_only, family = "binomial")
+summary(logistic_tfe)
+```
+Relation to duration
+```{r}
+logistic_2 <- feglm(searching ~ return_date + pelaydur, data = cps1994_2024_unemployed_tl_only, vcov = "HC1", family = "binomial")
+summary(logistic_2)
+logistic_2_tfe <- feglm(searching ~ return_date + pelaydur | factor(year), data = cps1994_2024_unemployed_tl_only, family = binomial())
+```
+Duration + Covariates: sex, FT/PT
+```{r}
+cps1994_2024_unemployed_tl_only %>%
+  group_by(prftlf) %>%
+  count()
+logistic_3 <- feglm(searching ~ return_date + pelaydur + male + part_time + age + highschool + bachelor, vcov = "HC1", data = cps1994_2024_unemployed_tl_only, family = "binomial")
+summary(logistic_3)
+logistic_3_tfe <- feglm(searching ~ return_date + pelaydur + male + part_time + age + highschool + bachelor | factor(year), vcov = "HC1", data = cps1994_2024_unemployed_tl_only, family = "binomial")
+```
+```{r}
+models <- list(logistic_basic, logistic_tfe, logistic_2, logistic_2_tfe, logistic_3, logistic_3_tfe) %>%
+  lapply(avg_slopes)
+# modelsummary(models, stars = TRUE)
+cr <- c("return_date" = "Holding a return date",
+        "pelaydur" = "Layoff duration (weeks)",
+        "male" = "Male",
+        "part_time" = "Part-time workforce",
+        "age" = "Age",
+        "highschool" = "Graduated from high school but not holding a bachelor degree",
+        "bachelor" = "Holding a bachelor degree or above")
+gm <- tribble(~raw, ~clean, ~fmt,
+              "nobs", "Number of observations", 0,
+              "aic", "AIC", 1)
+new_row <- tribble(~term, ~`(1)`, ~`(2)`, ~`(3)`, ~`(4)`, ~`(5)`, ~`(6)`,
+                   "Year FE", "", "X", "", "X", "", "X")
+attr(new_row, "position") <- 16
+modelsummary(models,
+             coef_rename = cr,
+             gof_map = gm,
+             add_rows = new_row,
+             title = "Results of logistic regressions.\\label{log_reg_res}",
+             notes = "\\footnotesize{Data source: CPS. Observation period is from January 1994 to December 2019. Average partial effects are reported with heteroscedasticity-robust standard errors in brackets. Individuals aged 80 or over are excluded. Part-time workforce indicates those who are on layoff from or looking for a part-time job instead of a full-time job. The base variable for the highest level of education indicator is not graduated from high school.}",
+             escape = FALSE,
+             output = "log_reg_res.tex",
+             stars = TRUE)
+```
+
+# Descriptive statistics, TL vs PS
+```{r}
+cps1994_2024_unemployed <- cps1994_2024_unemployed %>%
+  # filter(pruntype <= 5) %>% # remove new entrants
+  mutate(tl = pruntype == 1) # dummy for TL vs. PS
+```
+```{r}
+data_unique <- cps1994_2024_unemployed %>%
+  distinct(individual_id, .keep_all = TRUE) %>% # For those showing up twice or more, only keep the earliest record
+  filter(1 <= faminc & faminc <= 14)
+data_unique %>%
+  group_by(tl) %>%
+  count()
+
+data_unique %>%
+  group_by(tl, faminc) %>%
+  summarise(count = n()) %>%
+  mutate(prop = count / sum(count),
+         tlvsjl = if_else(tl, "TL workers", "JL workers")) %>%
+  ggplot(aes(x = factor(faminc), y = prop, fill = tlvsjl)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Family Income Level", y = "Density", fill = "Unemployment Type") #+
+  scale_y_continuous(limits = c(0, 0.12))
+ggsave("familyinc.pdf")
+
+
+# Count NA's for faminc
+cps1994_2024_unemployed %>%
+  distinct(individual_id, .keep_all = TRUE) %>%
+  mutate(faminc_valid = 1 <= faminc & faminc <= 14) %>%
+  group_by(tl, faminc_valid) %>%
+  count() %>% print(n = 100)
+```
+NOTE: N of NA's 225,058 out of 433,098 (51.96%)
+Proportion of NA among TL = 57.13% vs among PS = 50.71%
+
+- "Note: Caution should be used when using this variable since it has an allocation rate of approximately 20 percent."
+- VALID ENTRIES
+  - 1	LESS THAN $5,000
+  - 2	5,000 TO 7,499
+  - 3	7,500 TO 9,999
+  - 4	10,000 TO 12,499
+  - 5	12,500 TO 14,999
+  - 6	15,000 TO 19,999
+  - 7	20,000 TO 24,999
+  - 8	25,000 TO 29,999
+  - 9	30,000 TO 34,999
+  - 10	35,000 TO 39,999
+  - 11	40,000 TO 49,999
+  - 12	50,000 TO 59,999
+  - 13	60,000 TO 74,999
+  - 14	75,000 TO 99,999
+  - 15	100,000 TO 149,999
+  - 16	150,000 OR MORE
+
+```{r}
+data_unique_summary <- data_unique %>%
+  mutate(Married = as.numeric(married),
+         Male = as.numeric(male),
+         `Part-time workforce` = as.numeric(part_time),
+         `Graduated high school but not holding a bachelor degree` = as.numeric(highschool),
+         `Holding a bachelor degree or above` = as.numeric(bachelor),
+         Age = age,
+         `Family income level` = faminc,
+         tlvsjl = if_else(tl, "TL workers", "JL workers")) %>%
+  select(tlvsjl, Married, Male, `Part-time workforce`, Age, `Graduated high school but not holding a bachelor degree`, `Holding a bachelor degree or above`, `Family income level`)
+datasummary_balance(~tlvsjl,
+                    data = data_unique_summary,
+                    fmt = 3,
+                    add_rows = data.frame("$N$", "\\num{466445}", "", "\\num{85052}", "", "", ""),
+                    title = "Comparison of individual characteristics between TL and JL unemployed workers.\\label{tlvsjl}",
+                    notes = "\\footnotesize{Data source: CPS. Observation period is from January 1994 to December 2019. For those who responded as unemployed for multiple times to the survey, the response in the first survey month of unemployment is used for the analysis. Individuals aged 80 or over are excluded. Part-time workforce indicates those who are on layoff from or looking for a part-time job instead of a full-time job. Family income level classification can be found in the notes of Table \\ref{familyinc_level}.}",
+                    escape = FALSE,
+                    output = "tlvsjl.tex",
+                    stars = TRUE)
+```
+One interesting part is TLs are more likely to have a high school diploma but less likely to have a bachelor degree.

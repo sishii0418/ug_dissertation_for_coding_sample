@@ -1,0 +1,40 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Results of logistic regressions.\label{log_reg_res}},
+note{}={+ p \num{< 0.1}, * p \num{< 0.05}, ** p \num{< 0.01}, *** p \num{< 0.001}},
+note{ }={\footnotesize{Data source: CPS. Observation period is from January 1994 to December 2019. Average partial effects are reported with heteroscedasticity-robust standard errors in brackets. Individuals aged 80 or over are excluded. Part-time workforce indicates those who are on layoff from or looking for a part-time job instead of a full-time job. The base variable for the highest level of education indicator is not graduated from high school.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+hline{16}={1,2,3,4,5,6,7}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+Holding a return date                                        & \num{-0.180}*** & \num{-0.175}*** & \num{-0.171}*** & \num{-0.167}*** & \num{-0.157}*** & \num{-0.154}*** \\
+& (\num{0.002})   & (\num{0.003})   & (\num{0.002})   & (\num{0.002})   & (\num{0.002})   & (\num{0.002})   \\
+Layoff duration (weeks)                                      &                  &                  & \num{0.005}***  & \num{0.004}***  & \num{0.004}***  & \num{0.004}***  \\
+&                  &                  & (\num{0.000})   & (\num{0.000})   & (\num{0.000})   & (\num{0.000})   \\
+Age                                                          &                  &                  &                  &                  & \num{-0.003}*** & \num{-0.003}*** \\
+&                  &                  &                  &                  & (\num{0.000})   & (\num{0.000})   \\
+Holding a bachelor degree or above                           &                  &                  &                  &                  & \num{-0.015}*** & \num{-0.012}**  \\
+&                  &                  &                  &                  & (\num{0.004})   & (\num{0.004})   \\
+\Centerstack[l]{Graduated from high school \\ but not holding a bachelor degree} &                  &                  &                  &                  & \num{-0.057}*** & \num{-0.053}*** \\
+&                  &                  &                  &                  & (\num{0.008})   & (\num{0.008})   \\
+Male                                                         &                  &                  &                  &                  & \num{0.039}***  & \num{0.037}***  \\
+&                  &                  &                  &                  & (\num{0.003})   & (\num{0.003})   \\
+Part-time workforce                                          &                  &                  &                  &                  & \num{-0.122}*** & \num{-0.120}*** \\
+&                  &                  &                  &                  & (\num{0.003})   & (\num{0.003})   \\
+Number of observations                                       & \num{148433}    & \num{148433}    & \num{148433}    & \num{148433}    & \num{148433}    & \num{148433}    \\
+Year FE                                                      &                  & X                &                  & X                &                  & X                \\
+AIC                                                          & \num{190406.5}  & \num{189235.6}  & \num{188722.4}  & \num{187699.3}  & \num{184220.2}  & \num{183474.3}  \\
+\bottomrule
+\end{talltblr}
+\end{table}

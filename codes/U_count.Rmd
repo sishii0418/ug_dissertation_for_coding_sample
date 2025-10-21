@@ -1,0 +1,218 @@
+```{r}
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(marginaleffects)
+library(tis)
+library(tidyquant)
+library(urca)
+```
+```{r}
+# Pre-select variables to use
+selected_vars <- c(
+  "pruntype", # reason for unemployment
+  "pelaylk", # even though you are to be called back to work, have you been looking for work during the last 4 weeks.
+  "pulaydt", # has your employer given you a date to return to work?
+  "pulay6m", # have you been given any indication that you will be recalled to work within the next 6 months?
+  "pelaydur", # duriation of layoff
+  "hrmis", # month in sample
+  "hrmonth", # month of interview
+  "hryear", # year of interview, 2 digits, -1997
+  "hryear4", # year of interview, 4 digits, 1998-
+  "pwsswgt", # FINAL WEIGHT (4 IMPLIED DECIMAL PLACES) USED FOR MOST TABULATIONS, CONTROLLED TO INDEPENDENT ESTIMATES FOR 1) STATES; 2) ORIGIN, SEX, AND AGE; AND 3) AGE, RACE, AND SEX.
+  "pwcmpwgt", # Weight-composited final weight Person's final composited weight. Used to tabulate BLS's official published labor force statistics. (4 implied decimal places)
+  "prftlf" # full time labor force
+)
+cps1994_2024_unemployed <- haven::read_dta("data/cps1994-2024_unemployed.dta", encoding = "UTF-8", col_select = all_of(selected_vars))
+cps1994_2024_unemployed <- cps1994_2024_unemployed %>%
+  mutate(year = if_else(is.na(hryear4), as.numeric(paste0("19", hryear)), as.numeric(hryear4))) %>%
+  select(-hryear, -hryear4) %>%
+  filter(!is.na(pwcmpwgt))
+```
+
+# Recession period data
+```{r}
+# Call nberDates() to obtain recession date matrix
+recessions <- nberDates() %>%
+  data.frame() %>%
+  # lubridate
+  mutate(Start = lubridate::ymd(Start)) %>%
+  mutate(End = lubridate::ymd(End)) %>%
+  # only need after 1967
+  filter(ym(200012) <= Start &
+         End <= ym(201912))
+```
+
+```{r}
+U_counts <- cps1994_2024_unemployed %>%
+  # filter(prftlf == 1) %>%
+  mutate(tl = pruntype == 1,
+         tl_search = pelaylk == 1,
+         tl_nonsearch = pelaylk == 2) %>%
+  group_by(year, hrmonth, tl, tl_search, tl_nonsearch) %>%
+  summarise(sum(pwsswgt)/1000) %>%
+  pivot_wider(id_cols = c(year, hrmonth), names_from = c(tl, tl_search, tl_nonsearch), values_from = `sum(pwsswgt)/1000`) %>%
+  rename(JL = FALSE_FALSE_FALSE, TL_search = TRUE_TRUE_FALSE, TL_nonsearch = TRUE_FALSE_TRUE) %>%
+  mutate(TL = TL_nonsearch + TL_search,
+         U = JL + TL_nonsearch + TL_search) %>%
+  mutate(U_search = JL + TL_search) %>%
+  mutate(ym = ym(paste0(year, sprintf("%02d", hrmonth)))) %>%
+  ungroup() %>%
+  select(-year, -hrmonth)
+```
+
+
+```{r}
+jolts <- readRDS("codes_figures/jolts.Rds")
+jolts <- jolts %>%
+  rename(V = JTU000000000000000JOL,
+         M = JTU000000000000000HIL) #%>%
+#   select(-LNU03000000)
+
+data <- left_join(jolts, U_counts) %>%
+  mutate(monthdummy = factor(month(ym))) %>%
+  mutate(theta = log(V/U)) %>%
+  mutate(theta_delta = log(V/U) - dplyr::lag(theta)) %>%
+  mutate(theta_lag_2 = dplyr::lag(theta, 2),
+         theta_lag_3 = dplyr::lag(theta, 3),
+         theta_lag_4 = dplyr::lag(theta, 4),
+         theta_lag_5 = dplyr::lag(theta, 5),
+         theta_lag_6 = dplyr::lag(theta, 6),
+         theta_lag_7 = dplyr::lag(theta, 7)) %>%
+  mutate(f = log(M / U)) %>%
+  mutate(f_delta = f - dplyr::lag(f)) %>%
+  filter(ym <= ym(201912))
+```
+
+Search vs. non-search
+Benchmark: $M = V^\eta U^{1 - \eta}$
+Search vs. non-search: $M = V^\eta U_{search}^\alpha TL_{nonsearch}^{1 - \eta - \alpha}$
+```{r}
+data <- data %>%
+  mutate(y = log(M/U_search),
+         x1 = log(V/U_search),
+         x2 = log(TL_nonsearch/U_search)) %>%
+  mutate(y_delta = y - dplyr::lag(y),
+         x1_delta = x1 - dplyr::lag(x1),
+         x2_delta = x2 - dplyr::lag(x2)) %>%
+  mutate(x1_lag_2 = dplyr::lag(theta, 2),
+         x1_lag_3 = dplyr::lag(theta, 3),
+         x1_lag_4 = dplyr::lag(theta, 4),
+         x1_lag_5 = dplyr::lag(theta, 5)) %>%
+  mutate(TLns_share = TL_nonsearch / U) %>%
+  mutate(TLns_share_delta = TLns_share - dplyr::lag(TLns_share))
+ols_benchmark <- feols(f ~ theta + monthdummy, data = data, se = "hetero")
+summary(ols_benchmark)
+fd_benchmark <- feols(f_delta ~ 0 + theta_delta + monthdummy, data = data, se = "hetero")
+summary(fd_benchmark)
+iv_benchmark_fs <- lm(theta_delta ~ theta_lag_2 + theta_lag_3 + theta_lag_4 + theta_lag_5, data = data)
+summary(iv_benchmark_fs)
+iv_benchmark <- feols(f_delta ~ 0 + monthdummy | theta_delta ~ theta_lag_2 + theta_lag_3 + theta_lag_4 + theta_lag_5, data = data, se = "hetero")
+summary(iv_benchmark, stage = 1:2)
+
+ols_search <- feols(y ~ x1 + x2 + monthdummy, data = data, se = "hetero")
+summary(ols_search)
+fd_search <- feols(y_delta ~ 0 + x1_delta + x2_delta + monthdummy, data = data, se = "hetero")
+summary(fd_search)
+iv_search_fs_1 <- lm(x1_delta ~ theta_lag_2 + theta_lag_3 + theta_lag_4 + theta_lag_5, data = data)
+summary(iv_search_fs_1)
+iv_search_fs_2 <- lm(x2_delta ~ theta_lag_2 + theta_lag_3 + theta_lag_4 + theta_lag_5, data = data)
+summary(iv_search_fs_2)
+iv_search <- feols(y_delta ~ 0 + x2_delta + monthdummy | x1_delta ~ x1_lag_2 + x1_lag_3 + x1_lag_4 + x1_lag_5, data = data, se = "hetero")
+summary(iv_search, stage = 1:2)
+
+models <- list(ols_benchmark, ols_search, fd_benchmark, fd_search, iv_benchmark, iv_search)
+new_rows <- tribble(~term, ~`(1)`, ~`(2)`, ~`(3)`, ~`(4)`, ~`(5)`, ~`(6)`,
+                    "Sargan test", "", "", "", "", "11.9$^{**}$", "11.9$^{**}$",
+                    "($p$-value)", "", "", "", "", "(0.0078)", "(0.0025)",
+                    "First stage $F$-statistic", "", "", "", "", "9.68", "10.2")
+attr(new_rows, "position") <- 7:9
+modelsummary(models,
+             coef_omit = "monthdummy",
+             coef_rename = c(theta = "$\\eta$", theta_delta = "$\\eta$", x1 = "$\\eta$", x1_delta = "$\\eta$", fit_theta_delta = "$\\eta$", fit_x1_delta = "$\\eta$", x2 = "$\\alpha$", x2_delta = "$\\alpha$"),
+             gof_omit = "R2 Adj.|AIC|BIC|Std.Errors",
+             add_rows = new_rows,
+             stars = TRUE,
+             title = "Matching function estimation: baseline vs split in unemployment depending on searching or not\\label{matching_fn}",
+             notes = "\\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. The odd numbered columns shows estimates for the baseline model, while the even numbered for the extended model treating non-searching TL workers differently. Month dummies are included in the estimation. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are up to 5 lags of the corresponding endogenous variable.}",
+             escape = FALSE) %>%
+  tinytable::group_tt(j = list("OLS" = 2:3, "OLS in FD" = 4:5, "IV in FD" = 6:7)) %>%
+  tinytable::save_tt("draft/matching_fn.tex", overwrite = FALSE)
+
+ur.df(data$f, type = "drift", selectlags = "AIC", lags = 30) %>% summary()
+ur.df(data$theta, type = "drift", selectlags = "AIC", lags = 30) %>% summary()
+ur.df(data$y, type = "drift", selectlags = "AIC", lags = 30) %>% summary()
+ur.df(data$x1, type = "drift", selectlags = "AIC", lags = 30) %>% summary()
+ur.df(data$x2, type = "drift", selectlags = "AIC", lags = 30) %>% summary()
+```
+
+JL vs. TL
+JL vs. TL searching vs. TL non-searching
+```{r}
+data <- data %>%
+  mutate(y = log(M/JL),
+         x1 = log(V/JL),
+         x2 = log(TL/JL)) %>%
+  mutate(y_delta = y - dplyr::lag(y),
+         x1_delta = x1 - dplyr::lag(x1),
+         x2_delta = x2 - dplyr::lag(x2),) %>%
+  mutate(x1_lag_2 = dplyr::lag(theta, 2),
+         x1_lag_3 = dplyr::lag(theta, 3),
+         x1_lag_4 = dplyr::lag(theta, 4),
+         x1_lag_5 = dplyr::lag(theta, 5))
+ols_JLTL <- feols(y ~ x1 + x2 + monthdummy, data = data, se = "hetero")
+summary(ols_JLTL)
+fd_JLTL <- feols(y_delta ~ 0 + x1_delta + x2_delta + monthdummy, data = data, se = "hetero")
+summary(fd_JLTL)
+iv_JLTL <- feols(y_delta ~ 0 + x2_delta + monthdummy | x1_delta ~ x1_lag_2 + x1_lag_3 + x1_lag_4 + x1_lag_5, data = data, se = "hetero")
+summary(iv_JLTL)
+
+data <- data %>%
+  mutate(y = log(M/JL),
+         x1 = log(V/JL),
+         x2 = log(TL_search/JL),
+         x3 = log(TL_nonsearch/JL)) %>%
+  mutate(y_delta = y - dplyr::lag(y),
+         x1_delta = x1 - dplyr::lag(x1),
+         x2_delta = x2 - dplyr::lag(x2),
+         x3_delta = x3 - dplyr::lag(x3)) %>%
+  mutate(x1_lag_2 = dplyr::lag(theta, 2),
+         x1_lag_3 = dplyr::lag(theta, 3),
+         x1_lag_4 = dplyr::lag(theta, 4),
+         x1_lag_5 = dplyr::lag(theta, 5))
+ols_JLTLs <- feols(y ~ x1 + x2 + x3 + monthdummy, data = data, se = "hetero")
+summary(ols_JLTLs)
+fd_JLTLs <- feols(y_delta ~ 0 + x1_delta + x2_delta + x3_delta + monthdummy, data = data, se = "hetero")
+summary(fd_JLTLs)
+iv_JLTLs <- feols(y_delta ~ 0 + x2_delta + x3_delta + monthdummy | x1_delta ~ x1_lag_2 + x1_lag_3 + x1_lag_4 + x1_lag_5, data = data, se = "hetero")
+summary(iv_JLTLs)
+
+models <- list(ols_JLTL, ols_JLTLs, fd_JLTL, fd_JLTLs, iv_JLTL, iv_JLTLs)
+new_rows <- tribble(~term, ~`(1)`, ~`(2)`, ~`(3)`, ~`(4)`, ~`(5)`, ~`(6)`,
+                    "Sargan test", "", "", "", "", "12.3$^{**}$", "11.5$^{**}$",
+                    "($p$-value)", "", "", "", "", "(0.0065)", "(0.0093)",
+                    "First stage $F$-statistic", "", "", "", "", "10.1", "10.1")
+attr(new_rows, "position") <- 9:11
+modelsummary(models,
+             coef_omit = "monthdummy",
+             coef_rename = c(x1 = "\\eta", x1_delta = "\\eta", fit_x1_delta = "\\eta", x2 = "\\alpha", x2_delta = "\\alpha", x3 = "\\beta", x3_delta = "\\beta"),
+             title = "Matching function estimation: alternative splits in unemployment\\label{matching_fn_compare}",
+             notes = "\\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. The odd numbered columns show estimates for the model separating the unemployed workers into either TL or JL, while the even numbered for separating into JL, TL on search for a new job, and TL not on search for a new job. Month dummies are included in the estimation. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are up to 5 lags of the corresponding endogeneous variable.}",
+             gof_omit = "R2 Adj.|AIC|BIC|Std.Errors",
+             add_rows = new_rows,
+             stars = TRUE) %>%
+  tinytable::group_tt(j = list("OLS" = 2:3, "OLS in FD" = 4:5, "IV in FD" = 6:7)) %>%
+  tinytable::save_tt("draft/matching_fn_compare.tex", overwrite = TRUE)
+
+data %>%
+  ggplot() +
+  geom_ma(n = 12, aes(x = ym, y = ols_benchmark$residuals, color = "Baseline"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = ols_search$residuals, color = "Search/Non-search"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = ols_JLTL$residuals, color = "TL/JL"), linetype = 1) +
+  geom_ma(n = 12, aes(x = ym, y = ols_JLTLs$residuals, color = "Searching TL/Non-searching TL/JL"), linetype = 1) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = -0.15, ymax = 0.2),
+            alpha = 0.2) +
+  labs(x = "Date", y = "Matching efficiency (residuals)", color = "Models")
+ggsave("draft/efficiency.pdf")
+```

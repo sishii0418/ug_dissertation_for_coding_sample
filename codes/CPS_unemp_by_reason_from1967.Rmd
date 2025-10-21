@@ -1,0 +1,100 @@
+# Load library
+```{r}
+library(tidyverse)
+library(tis)
+library(tidyquant)
+```
+
+# Source
+Pick the following from the URL below, choose "Multi-series table", "Text, comma delimited", from 1967 to the latest.
+
+https://data.bls.gov/toppicks?survey=ln
+
+- Civilian Labor Force Level - LNS11000000
+- Unemployment Level Job Losers On Layoff - LNS13023653
+- Unemployment Level Job Losers Not on Layoff - LNS13025699
+- Unemployment Level Job Leavers - LNS13023705
+- Unemployment Level Reentrants To Labor Force - LNS13023557
+- Unemployment Level New Entrants - LNS13023569
+
+The values are already seasonally adjusted.
+Save it as `../data/CPS_unemp_by_reason_from1967.csv`.
+
+# Load data saved as csv
+```{r}
+# Read csv and transpose
+data <- read_csv("data/CPS_unemp_by_reason_from1967.csv") %>% t()
+# First row to be column names
+colnames(data) <- data[1, ]
+data <- data.frame(data[-1, ])
+# Row names to be column "ym", which is to be parsed
+data <- data %>%
+  rownames_to_column("ym") %>%
+  mutate(ym = my(ym))
+# Remove parenthesis in LF figures
+data <- data %>%
+  mutate(LNS11000000 = str_remove_all(LNS11000000, "\\(1\\)"))
+# Remove rows newer than available
+data <- data %>%
+  filter(ym < ym(202410))
+```
+
+# Calculate proportions every month
+```{r}
+data <- data %>%
+  mutate(lf = as.numeric(LNS11000000)) %>%
+  mutate(tl = as.numeric(LNS13023653)) %>%
+  mutate(ps = as.numeric(LNS13025699) + as.numeric(LNS13023705)) %>%
+  mutate(en = as.numeric(LNS13023557) + as.numeric(LNS13023569)) %>%
+  mutate(tl_share = tl / lf) %>%
+  mutate(ps_share = ps / lf) %>%
+  mutate(en_share = en / lf) %>%
+  mutate(U = ps + tl + en)
+```
+
+# Recession period data
+```{r}
+# Call nberDates() to obtain recession date matrix
+recessions <- nberDates() %>%
+  data.frame() %>%
+  # lubridate
+  mutate(Start = lubridate::ymd(Start)) %>%
+  mutate(End = lubridate::ymd(End)) %>%
+  # only need after 1967
+  filter(Start >= min(data$ym))
+```
+
+# Plot
+```{r}
+data_longer <- data %>%
+  pivot_longer(cols = c(tl_share, ps_share, en_share))
+unemp_stock_by_reason <- ggplot() +
+  geom_line(aes(x = ym, y = value, color = name, linetype = name),
+            data = data_longer) +
+  labs(x = "Time", y = "Proportion") +
+  scale_color_hue(name = "Reason",
+                  labels = c("Entrants",
+                             "Permanent separations",
+                             "Temporary layoffs")) +
+  scale_linetype(name = "Reason",
+                 labels = c("Entrants",
+                            "Permanent separations",
+                            "Temporary layoffs")) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = 0, ymax = 0.125),
+            alpha = 0.2) +
+  coord_cartesian(ylim = c(0, 0.12))
+
+unemp_stock_by_reason
+```
+
+## Plot share of TL out of the whole U
+```{r}
+ggplot() +
+  geom_ma(aes(x = ym, y = tl / U), data = data %>% filter(ym <= ym(201912)), n = 3, color = "black", linetype = 1) +
+  geom_rect(data = recessions,
+            aes(xmin = Start, xmax = End, ymin = 0, ymax = 0.3),
+            alpha = 0.3) +
+  labs(x = "Date", y = "Share of Temporary Layoff across All Types of Unemployment")
+ggsave("TL_share_out_of_U.pdf")
+```

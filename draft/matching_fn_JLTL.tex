@@ -1,0 +1,38 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Matching function estimation results with different unemployment types.\label{matching_fn_JLTL}},
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+note{ }={\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. Dependent variables for Columns (1), (4), and (7) are the log of job finding rate for the JL workers, Columns (2), (5), and (7) the log of job finding rate for the whole TL workers, and Columns (3), (6), and (9) the log of job finding rate for the TL workers looking for a new job. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (7), (8), and (9) are lags of log market tightness up to 5.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=3,}{halign=c,},
+cell{1}{5}={c=3,}{halign=c,},
+cell{1}{8}={c=3,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+column{8}={halign=c,},
+column{9}={halign=c,},
+column{10}={halign=c,},
+hline{7}={1,2,3,4,5,6,7,8,9,10}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS &  &  & OLS in FD &  &  & IV in FD &  &  \\ \cmidrule[lr]{2-4}\cmidrule[lr]{5-7}\cmidrule[lr]{8-10}
+& (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) \\ \midrule %% TinyTableHeader
+(Intercept)  & -1.627*** & -1.050*** & -1.113*** &         &         &         &         &         &         \\
+& (0.030)   & (0.036)   & (0.034)   &         &         &         &         &         &         \\
+$\log(V/U)$ & 0.277***  & 0.031     & 0.132***  & 0.248** & 0.204   & 0.532** & 0.406   & 0.220   & 0.609   \\
+& (0.017)   & (0.040)   & (0.027)   & (0.086) & (0.196) & (0.183) & (0.270) & (0.397) & (0.438) \\
+Sargan test  &           &           &           &         &         &         & 5.84    & 0.40    & 0.93    \\
+($p$-value)  &           &           &           &         &         &         & (0.12)  & (0.94)  & (0.82)  \\
+Num.Obs.     & 229       & 229       & 229       & 228     & 228     & 228     & 224     & 224     & 224     \\
+RMSE         & 1.88      & 1.29      & 1.39      & 0.09    & 0.24    & 0.20    & 0.09    & 0.24    & 0.20    \\
+\bottomrule
+\end{talltblr}
+\end{table}

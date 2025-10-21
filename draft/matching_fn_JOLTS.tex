@@ -1,0 +1,35 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Matching function estimation results with different estimation strategies for job finding rates.\label{matching_fn_JOLTS}},
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+note{ }={\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. Month dummies are included in the estimation. Dependent variables are the log of job finding rate, for which in Columns (1), (3), and (5) is calculated based on individual labour market status transitions recorded in CPS, and in Columns (2), (4), and (6) is derived from the JOLTS hiring level divided by CPS unemployment level. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are lags of log market tightness up to 5.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+cell{1}{6}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+hline{7}={1,2,3,4,5,6,7}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS &  & OLS in FD &  & IV in FD &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}\cmidrule[lr]{6-7}
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+(Intercept)  & -1.487*** & -0.150*** &         &          &         &           \\
+& (0.025)   & (0.029)   &         &          &         &           \\
+$\log(V/U)$ & 0.251***  & 0.695***  & 0.231** & 0.309*** & 0.406   & 0.521***  \\
+& (0.015)   & (0.012)   & (0.082) & (0.045)  & (0.270) & (0.135)   \\
+Sargan test  &           &           &         &          & 4.13    & 10.63$^*$ \\
+($p$-value)  &           &           &         &          & (0.25)  & (0.014)   \\
+Num.Obs.     & 229       & 229       & 228     & 228      & 224     & 224       \\
+RMSE         & 1.75      & 0.12      & 0.09    & 0.05     & 0.09    & 0.05      \\
+\bottomrule
+\end{talltblr}
+\end{table}

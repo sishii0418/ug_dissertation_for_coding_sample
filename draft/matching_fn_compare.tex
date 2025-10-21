@@ -1,0 +1,41 @@
+\begin{table}
+\centering
+\begin{talltblr}[         %% tabularray outer open
+caption={Matching function estimation: alternative splits in unemployment\label{matching_fn_compare}},
+note{}={+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001},
+note{ }={\footnotesize{Data source: CPS and JOLTS. Observation period is from December 2000 to December 2019. The odd numbered columns show estimates for the JL/TL split model, while the even numbered for the three-way split model. Month dummies are included in the estimation. Heteroscedasticity-robust standard errors are reported in parentheses. Instruments for Columns (5) and (6) are up to 5 lags of the corresponding endogeneous variable.}},
+]                     %% tabularray outer close
+{                     %% tabularray inner open
+colspec={Q[]Q[]Q[]Q[]Q[]Q[]Q[]},
+cell{1}{2}={c=2,}{halign=c,},
+cell{1}{4}={c=2,}{halign=c,},
+cell{1}{6}={c=2,}{halign=c,},
+column{1}={halign=l,},
+column{2}={halign=c,},
+column{3}={halign=c,},
+column{4}={halign=c,},
+column{5}={halign=c,},
+column{6}={halign=c,},
+column{7}={halign=c,},
+hline{11}={1,2,3,4,5,6,7}{solid, 0.05em, black},
+}                     %% tabularray inner close
+\toprule
+& OLS &  & OLS in FD &  & IV in FD &  \\ \cmidrule[lr]{2-3}\cmidrule[lr]{4-5}\cmidrule[lr]{6-7}
+& (1) & (2) & (3) & (4) & (5) & (6) \\ \midrule %% TinyTableHeader
+(Intercept)               & 0.660*** & 1.120*** &          &          &             &             \\
+& (0.054)  & (0.070)  &          &          &             &             \\
+\eta                     & 0.597*** & 0.661*** & 0.316*** & 0.320*** & 0.523***    & 0.533***    \\
+& (0.015)  & (0.026)  & (0.044)  & (0.044)  & (0.134)     & (0.132)     \\
+\alpha                   & 0.512*** & 0.352*** & 0.049    & 0.059**  & 0.029       & 0.055*      \\
+& (0.035)  & (0.043)  & (0.031)  & (0.021)  & (0.033)     & (0.023)     \\
+\beta                    &          & 0.160**  &          & 0.005    &             & -0.010      \\
+&          & (0.058)  &          & (0.025)  &             & (0.027)     \\
+Sargan test               &          &          &          &          & 12.3$^{**}$ & 11.5$^{**}$ \\
+($p$-value)               &          &          &          &          & (0.0065)    & (0.0093)    \\
+First stage $F$-statistic &          &          &          &          & 10.1        & 10.1        \\
+Num.Obs.                  & 229      & 229      & 228      & 228      & 224         & 224         \\
+R2                        & 0.950    & 0.956    & 0.890    & 0.892    & 0.877       & 0.878       \\
+RMSE                      & 0.09     & 0.09     & 0.05     & 0.05     & 0.05        & 0.05        \\
+\bottomrule
+\end{talltblr}
+\end{table}
