@@ -1,5 +1,8 @@
-# ug_dissertation_for_coding_sample
-Writing and coding samples from my undergraduate dissertation at the University of Edinburgh.
+# Undergraduate Dissertation for Writing and Coding Samples
+
+**✨️Writing sample is in `draft/draft.pdf`. Coding samples are in the `codes/` folder.**
+
+Writing and coding samples from my undergraduate dissertation at the University of Edinburgh, written in the year 2024-2025.
 
 Title: Jobless Unemployed Workers and Temporary Layoff Workers on Search and Not on Search for a New Job in the US Labour Market
 Supervisor: Prof Jesper Bagger
